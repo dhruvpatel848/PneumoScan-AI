@@ -33,9 +33,29 @@ if physical_devices:
         logger.error(f"Memory growth config failed: {e}")
 
 # Load the pneumonia detection model
-model_path = 'model/model.h5'
-if not os.path.exists(model_path):
-    raise FileNotFoundError("Model not found at model/model.h5")
+MODEL_URL = "https://huggingface.co/dhruvpatel8848/pneumoscan-model/resolve/main/model.h5"
+MODEL_PATH = "model.h5"  # Save in root or use 'model/model.h5' if preferred
+
+# Download the model if it doesn't exist
+if not os.path.exists(MODEL_PATH):
+    logger.info("Model not found locally. Downloading from Hugging Face...")
+    try:
+        response = requests.get(MODEL_URL, stream=True)
+        with open(MODEL_PATH, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        logger.info("Model downloaded successfully.")
+    except Exception as e:
+        logger.error(f"Failed to download model: {e}")
+        raise
+
+# Load the model
+try:
+    model = load_model(MODEL_PATH)
+    logger.info("Model loaded successfully.")
+except Exception as e:
+    logger.error(f"Model loading error: {e}")
+    raise
 
 try:
     model = load_model(model_path)

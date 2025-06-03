@@ -58,7 +58,7 @@ except Exception as e:
     raise
 
 try:
-    model = load_model(model_path)
+    model = load_model(MODEL_PATH)
 except Exception as e:
     logger.error(f"Model loading error: {e}")
     raise
